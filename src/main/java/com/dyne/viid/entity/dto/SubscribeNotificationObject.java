@@ -28,75 +28,48 @@ public class SubscribeNotificationObject implements Serializable {
     @JsonProperty("SubscribeID")
     private String SubscribeID;
 
-    @ApiModelProperty(value = "订阅类别")
-    @JsonProperty("SubscribeDetail")
-    private String SubscribeDetail;
+    @ApiModelProperty(value = "主题目标")
+    @JsonProperty("Title")
+    private String Title;
 
-    @ApiModelProperty(value = "订阅资源目录")
-    @JsonProperty("ResourceClass")
-    private Integer ResourceClass;
+    @ApiModelProperty(value = "触发时间")
+    @JsonProperty("TriggerTime")
+    private LocalDateTime TriggerTime;
 
-    @ApiModelProperty(value = "订阅资源路径")
-    @JsonProperty("ResourceURI")
-    private String ResourceURI;
+    @ApiModelProperty(value = "信息标识")
+    @JsonProperty("InfoIDs")
+    private String InfoIDs;
 
-    @ApiModelProperty(value = "申请人")
-    @JsonProperty("ApplicantName")
-    private String ApplicantName;
+    // todo CaseObjectList 视频案件集合
 
-    @ApiModelProperty(value = "申请单位")
-    @JsonProperty("ApplicantOrg")
-    private String ApplicantOrg;
+    // todo Tollgate 视频卡口信息集合
 
-    @ApiModelProperty(value = "开始时间")
-    @JsonProperty("BeginTime")
-    private LocalDateTime BeginTime;
+    // todo Lane 车道信息数据集
 
-    @ApiModelProperty(value = "结束时间")
-    @JsonProperty("EndTime")
-    private LocalDateTime EndTime;
+    // todo DeviceList 设备信息数据集
 
-    @ApiModelProperty(value = "信息接收地址")
-    @JsonProperty("ReceiveAddr")
-    private String ReceiveAddr;
+    // todo DeviceStatusList // 针对设备批量订阅方式
 
-    @ApiModelProperty(value = "信息上报间隔")
-    @JsonProperty("ReportInterval")
-    private Integer ReportInterval;
+    // todo APSObjectList 采集系统
 
-    @ApiModelProperty(value = "理由")
-    @JsonProperty("Reason")
-    private String Reason;
+    // todo APSStatusObjectList
 
-    @ApiModelProperty(value = "订阅执行状态，只读0订阅者1已取消2到期9未订阅")
-    @JsonProperty("SubscribeStatus")
-    private Integer SubscribeStatus;
+    // todo PersonObjectList
 
-    @ApiModelProperty(value = "订阅取消单位")
-    @JsonProperty("SubscribeCancelOrg")
-    private String SubscribeCancelOrg;
+    // todo FaceObjectList
 
-    @ApiModelProperty(value = "订阅取消人")
-    @JsonProperty("SubscribeCancelPerson")
-    private String SubscribeCancelPerson;
+    // todo MotorVehicleObjectList
 
-    @ApiModelProperty(value = "取消时间")
-    @JsonProperty("CancelTime")
-    private LocalDateTime CancelTime;
+    // todo NonMotorVehicleObjectList
 
-    @ApiModelProperty(value = "取消原因")
-    @JsonProperty("CancelReason")
-    private String CancelReason;
+    // todo ThingObjectList
 
-    @ApiModelProperty(value = "返回结果图片约定")
-    @JsonProperty("ResultImageDeclare")
-    private String ResultImageDeclare;
+    // todo SceneObjectList
 
-    @ApiModelProperty(value = "返回结果特征值约定")
-    @JsonProperty("ResultFeatureDeclare")
-    private String ResultFeatureDeclare;
+    // todo DataClassTabObjectList
 
-    @ApiModelProperty(value = "订阅分类标签标识")
-    @JsonProperty("TabID")
-    private String TabID;
+    // 1添加 2修改 3删除
+    @ApiModelProperty(value = "更新项目")
+    @JsonProperty("ExecuteOperation")
+    private Integer ExecuteOperation;
 }

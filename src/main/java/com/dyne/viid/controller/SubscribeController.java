@@ -1,8 +1,10 @@
 package com.dyne.viid.controller;
 
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.dyne.viid.common.annotation.LogOperation;
 import com.dyne.viid.common.annotation.RequireAuth;
+import com.dyne.viid.common.constant.Constants;
 import com.dyne.viid.common.result.ConfirmStatusType;
 import com.dyne.viid.common.result.ResponseStatusListObject;
 import com.dyne.viid.common.result.ResponseStatusObject;
@@ -16,8 +18,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -39,10 +43,14 @@ public class SubscribeController {
     @Autowired
     VmsSubscribeService vmsSubscribeService;
 
+    @Autowired
+    StringRedisTemplate stringRedisTemplate;
+
     @RequireAuth
     @PostMapping("/Subscribes")
     @LogOperation("批量订阅")
-    public ResponseStatusListObject register(@RequestBody SubscribeListObject subscribeListObject) {
+    public ResponseStatusListObject register(HttpServletRequest request, @RequestBody SubscribeListObject subscribeListObject) {
+        String userIdentify = request.getHeader(Constants.USER_IDENTIFY);
         List<ResponseStatusObject> list = new ArrayList<>(subscribeListObject.getSubscribeObjects().size());
         ResponseStatusObject responseStatusObject;
         String errMsg;
@@ -58,7 +66,11 @@ public class SubscribeController {
             // 订阅信息入库
             VmsSubscribe vmsSubscribe = new VmsSubscribe();
             BeanUtils.copyProperties(subscribeObject, vmsSubscribe);
-            vmsSubscribeService.save(vmsSubscribe);
+            if (vmsSubscribe.getOperateType() == 0) {
+                vmsSubscribeService.save(vmsSubscribe);
+            } else {
+                vmsSubscribeService.update(vmsSubscribe, new QueryWrapper<VmsSubscribe>().eq("SubscribeID", vmsSubscribe.getSubscribeID()));
+            }
         }
         return ResponseStatusListObject.create(list);
     }

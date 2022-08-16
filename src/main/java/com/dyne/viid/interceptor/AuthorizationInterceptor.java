@@ -80,7 +80,13 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
         String userIdentify = request.getHeader(Constants.USER_IDENTIFY);
         log.info("userIdentify:{}", userIdentify);
         if (StringUtils.isNotBlank(userIdentify)) {
-
+            String requestURI = request.getRequestURI();
+            log.info("URI:{}", requestURI);
+            if (requestURI.equals("/VIID/Subscribes")) {
+                if (StringUtils.isBlank(stringRedisTemplate.opsForValue().get(Constants.SERVER_kEY + userIdentify))) {
+                    return false;
+                }
+            }
             String deviceId = stringRedisTemplate.opsForValue().get(Constants.KEEP_ALIVE + userIdentify);
 //            String deviceId = LocalCacheUtil.get(userIdentify);
             if (StringUtils.isNotBlank(deviceId)) {

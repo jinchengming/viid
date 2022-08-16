@@ -18,8 +18,10 @@ import org.springframework.http.converter.ResourceHttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.http.converter.support.AllEncompassingFormHttpMessageConverter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -44,15 +46,6 @@ public class WebMvcConfig implements WebMvcConfigurer {
         LoginAuthInterceptor loginAuthInterceptor = new LoginAuthInterceptor();
         registry.addInterceptor(authorizationInterceptor).addPathPatterns("/VIID/**");
         registry.addInterceptor(loginAuthInterceptor).excludePathPatterns("/api/sys/**").addPathPatterns("/api/**");
-    }
-
-    @Override
-    public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**")
-                .allowedOrigins("*")
-                .allowCredentials(false)
-                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                .maxAge(3600);
     }
 
     @Override
@@ -101,6 +94,26 @@ public class WebMvcConfig implements WebMvcConfigurer {
         public LocalDateTime deserialize(JsonParser p, DeserializationContext deserializationContext) throws IOException {
             return LocalDateTime.parse(p.getValueAsString(), ofPattern(DatePattern.PURE_DATETIME_PATTERN));
         }
+    }
+
+    /**
+     * 跨越配置
+     */
+    @Bean
+    public CorsFilter corsFilter() {
+        CorsConfiguration config = new CorsConfiguration();
+        // 设置允许跨域请求的域名
+        config.addAllowedOrigin("*");
+        // 是否允许证书 不再默认开启
+        // config.setAllowCredentials(true);
+        // 设置允许的方法
+        config.addAllowedMethod("*");
+        // 允许任何头
+        config.addAllowedHeader("*");
+//        config.addExposedHeader("token");
+        UrlBasedCorsConfigurationSource configSource = new UrlBasedCorsConfigurationSource();
+        configSource.registerCorsConfiguration("/**", config);
+        return new CorsFilter(configSource);
     }
 
 }

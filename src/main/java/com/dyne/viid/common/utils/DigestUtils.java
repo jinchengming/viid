@@ -2,6 +2,7 @@ package com.dyne.viid.common.utils;
 
 
 import cn.hutool.core.util.IdUtil;
+import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.SecureUtil;
 import com.dyne.viid.entity.DigestAuthInfo;
@@ -92,27 +93,26 @@ public class DigestUtils {
     }
 
     public static String generateAuthorization(String auth, String username, String password) {
-        // Digest realm="dyne1400",nonce="a2d901442d904574a7dc2255d20c6096",qop="auth"
-        //Digest username=%s, realm=%s, nonce=%s, uri="/VIID/System/Register", algorithm="MD5", response=%s
+        String cnonce = RandomUtil.randomString(8);
         DigestAuthInfo authInfoObject = getAuthInfoObject(auth);
         String realm = authInfoObject.getRealm();
         String nonce = authInfoObject.getNonce();
-        String qop = authInfoObject.getQop();
+        log.info("ha1 : {}", StrUtil.format(TEMPLATE_THREE, username, realm, password));
         String HA1 = md5(StrUtil.format(TEMPLATE_THREE, username, realm, password));
-        String HD = StrUtil.format(TEMPLATE_FOUR, nonce, authInfoObject.getNc(), authInfoObject.getCnonce(), authInfoObject.getQop());
+        String HD = StrUtil.format(TEMPLATE_FOUR, nonce, "00000001", cnonce, authInfoObject.getQop());
         String HA2 = md5(StrUtil.format(TEMPLATE_TWO, "POST", "/VIID/System/Register"));
         log.info("md5 str : {}", StrUtil.format(TEMPLATE_THREE, HA1, HD, HA2));
         String responseValid = md5(StrUtil.format(TEMPLATE_THREE, HA1, HD, HA2));
         log.info("{}-{}-{}", HA1, HA2, HD);
         log.info("HD:{}", HD);
-        String authorization = StrUtil.format("Digest username={}, realm={}, nonce={}, uri=\"/VIID/System/Register\", algorithm=\"MD5\",qop={},response={}", username, realm, nonce, qop, responseValid);
+        String authorization = StrUtil.format("Digest username={}, realm={}, nonce={}, uri=/VIID/System/Register, algorithm=MD5,qop=auth, nc={}, cnonce={}, response={}", username, realm, nonce, "00000001", cnonce, responseValid);
         log.info("authorization");
         return authorization;
     }
 
-//    3339608253b9a9f919e7bafe080fc45c:76aed177548d458ea8808a68acda988e:null:null:auth:e981db7569f065fda647d8236af6f901
-//    3339608253b9a9f919e7bafe080fc45c:e2aa711a61474a8fa8bdde0d39b412d0:null:null:null:e981db7569f065fda647d8236af6f901
-
-//    HD:c6cdc1c4ed2e496ab3daf4bf3ed879a0:null:null:auth
-//    HD:e2aa711a61474a8fa8bdde0d39b412d0:null:null:null
+    public static void main(String[] args) {
+        // Digest username="chengmingceshi", realm="32010400", nonce="1b98bfe63bb9ad6dbac1498864e3e246", uri="/VIID/System/Register", algorithm="MD5", qop=auth, nc=00000001, cnonce="DlWzJ2CZ", response="e744917c563af5c234fc6c58045e6961"
+        String s = generateAuthorization("Digest realm=32010400, nonce=1b98bfe63bb9ad6dbac1498864e3e246, qop=auth", "chengmingceshi", "chengmingceshi");
+        System.out.println(s);
+    }
 }

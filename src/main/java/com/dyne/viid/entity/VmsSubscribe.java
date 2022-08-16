@@ -1,6 +1,7 @@
 package com.dyne.viid.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -105,6 +106,10 @@ public class VmsSubscribe implements Serializable {
 
     @ApiModelProperty(value = "理由")
     private String Reason;
+
+    @ApiModelProperty(value = "操作类型")
+    @JsonProperty("OperateType")
+    private Integer OperateType;
 
     @ApiModelProperty(value = "订阅执行状态，只读0订阅者1已取消2到期9未订阅")
     private Integer SubscribeStatus;

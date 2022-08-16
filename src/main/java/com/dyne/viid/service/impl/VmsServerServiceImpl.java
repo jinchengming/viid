@@ -87,6 +87,7 @@ public class VmsServerServiceImpl extends ServiceImpl<VmsServerMapper, VmsServer
                 if (authStrList != null && authStrList.size() > 0) {
                     String authStr = authStrList.get(0);
                     sendRegister2(server, url, authStr);
+                    return;
                 }
             }
         } catch (Exception e) {

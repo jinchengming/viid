@@ -41,6 +41,13 @@ public class VmsDeviceController {
         return Result.ok();
     }
 
+    @PutMapping
+    public Result update(@RequestBody VmsDevice device) {
+        device.setApeID(null);
+        vmsDeviceService.updateById(device);
+        return Result.ok();
+    }
+
     @GetMapping
     public Result page(@RequestParam(value = "pageNum", defaultValue = "1") Integer pageNum,
                        @RequestParam(value = "pageSize", defaultValue = "20") Integer pageSize) {
@@ -50,7 +57,7 @@ public class VmsDeviceController {
 
 
     @DeleteMapping("/{id}")
-    public Result delete(@PathVariable(value = "id") Integer id) {
+    public Result delete(@PathVariable(value = "id") String id) {
         VmsDevice byId = vmsDeviceService.getById(id);
         if (byId != null) {
             // todo 其他缓存也要删除

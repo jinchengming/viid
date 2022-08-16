@@ -35,6 +35,10 @@ public class VmsServerController {
         if (save) {
             stringRedisTemplate.opsForValue().set(Constants.SERVER_kEY + server.getApsId(), server.getApsId());
         }
+        // 如果是下级 直接加入keep缓存 通知的时候不需要校验是否保活
+        if (server.getType() == 1) {
+            stringRedisTemplate.opsForValue().set(Constants.KEEP_ALIVE + server.getApsId(), server.getApsId());
+        }
         return Result.ok();
     }
 
@@ -51,6 +55,7 @@ public class VmsServerController {
         VmsServer byId = serverService.getById(id);
         if (byId != null) {
             stringRedisTemplate.delete(Constants.SERVER_kEY + byId.getApsId());
+            stringRedisTemplate.delete(Constants.KEEP_ALIVE + byId.getApsId());
             serverService.removeById(id);
         }
         return Result.ok();
