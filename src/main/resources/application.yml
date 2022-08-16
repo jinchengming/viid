@@ -1,0 +1,44 @@
+server:
+  tomcat:
+    uri-encoding: UTF-8
+  port: 9090
+
+spring:
+  profiles:
+    active: uat
+  http:
+    digest:
+      relam: dyne1400
+
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
+
+  rabbitmq:
+    # 开启消息发送端确认 - p->b
+    publisher-confirm-type: correlated
+    # 开启发送端消息抵达队列的确认
+    publisher-returns: true
+    # 只要消息抵达队列，以异步发送优先回调我们这个 return confirm
+    template:
+      mandatory: true
+    # 手动ack
+    listener:
+      simple:
+        acknowledge-mode: manual
+    host: dyne.zed1.cn
+    port: 5672
+    virtual-host: /
+    username: root
+    password: Lua12378900
+
+
+mybatis-plus:
+  mapper-locations: com/dyne/viid/mapper/xml/*.xml
+  configuration:
+    log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
+    map-underscore-to-camel-case: false
+
+viid:
+  aps-id: 32010400005037000222

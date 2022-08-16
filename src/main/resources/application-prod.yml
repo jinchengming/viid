@@ -1,0 +1,17 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/viid?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+    username: root
+    password: chengming123
+
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    password: chengming123
+
+minio:
+  endpoint: http://36.147.14.40:29001
+  accessKey: minio
+  secretKey: lua12378900
+  bucketName: viid-dev
