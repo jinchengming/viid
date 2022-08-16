@@ -1,7 +1,6 @@
 package com.dyne.viid.controller;
 
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.dyne.viid.common.annotation.LogOperation;
 import com.dyne.viid.common.annotation.RequireAuth;
 import com.dyne.viid.common.constant.Constants;
@@ -66,11 +65,12 @@ public class SubscribeController {
             // 订阅信息入库
             VmsSubscribe vmsSubscribe = new VmsSubscribe();
             BeanUtils.copyProperties(subscribeObject, vmsSubscribe);
-            if (vmsSubscribe.getOperateType() == 0) {
-                vmsSubscribeService.save(vmsSubscribe);
-            } else {
-                vmsSubscribeService.update(vmsSubscribe, new QueryWrapper<VmsSubscribe>().eq("SubscribeID", vmsSubscribe.getSubscribeID()));
-            }
+//            if (vmsSubscribe.getOperateType() == 0) {
+//                vmsSubscribeService.save(vmsSubscribe);
+//            } else {
+//                vmsSubscribeService.update(vmsSubscribe, new QueryWrapper<VmsSubscribe>().eq("SubscribeID", vmsSubscribe.getSubscribeID()));
+//            }
+            vmsSubscribeService.saveSubscribe(vmsSubscribe);
         }
         return ResponseStatusListObject.create(list);
     }

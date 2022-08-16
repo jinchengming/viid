@@ -15,23 +15,23 @@ spring:
       max-file-size: 100MB
       max-request-size: 100MB
 
-  rabbitmq:
-    # 开启消息发送端确认 - p->b
-    publisher-confirm-type: correlated
-    # 开启发送端消息抵达队列的确认
-    publisher-returns: true
-    # 只要消息抵达队列，以异步发送优先回调我们这个 return confirm
-    template:
-      mandatory: true
-    # 手动ack
-    listener:
-      simple:
-        acknowledge-mode: manual
-    host: dyne.zed1.cn
-    port: 5672
-    virtual-host: /
-    username: root
-    password: Lua12378900
+#  rabbitmq:
+#    # 开启消息发送端确认 - p->b
+#    publisher-confirm-type: correlated
+#    # 开启发送端消息抵达队列的确认
+#    publisher-returns: true
+#    # 只要消息抵达队列，以异步发送优先回调我们这个 return confirm
+#    template:
+#      mandatory: true
+#    # 手动ack
+#    listener:
+#      simple:
+#        acknowledge-mode: manual
+#    host: dyne.zed1.cn
+#    port: 5672
+#    virtual-host: /
+#    username: root
+#    password: Lua12378900
 
 
 mybatis-plus:

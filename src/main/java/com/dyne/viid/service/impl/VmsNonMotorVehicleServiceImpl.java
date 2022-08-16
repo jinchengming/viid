@@ -1,16 +1,13 @@
 package com.dyne.viid.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.dyne.viid.common.enums.AlarmMsgType;
 import com.dyne.viid.entity.VmsImage;
 import com.dyne.viid.entity.VmsNonMotorVehicle;
 import com.dyne.viid.entity.VmsNonMotorVehicleImage;
 import com.dyne.viid.mapper.VmsNonMotorVehicleMapper;
-import com.dyne.viid.service.MqService;
 import com.dyne.viid.service.VmsImageService;
 import com.dyne.viid.service.VmsNonMotorVehicleImageService;
 import com.dyne.viid.service.VmsNonMotorVehicleService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,8 +31,6 @@ public class VmsNonMotorVehicleServiceImpl extends ServiceImpl<VmsNonMotorVehicl
     @Resource
     private VmsNonMotorVehicleImageService vmsNonMotorVehicleImageService;
 
-    @Autowired
-    private MqService mqService;
 
     @Transactional
     @Override
@@ -48,6 +43,5 @@ public class VmsNonMotorVehicleServiceImpl extends ServiceImpl<VmsNonMotorVehicl
             vmsNonMotorVehicleImage.setImageID(vmsImage.getID());
             vmsNonMotorVehicleImageService.save(vmsNonMotorVehicleImage);
         }
-        mqService.sendMsgToMQ(vmsNonMotorVehicle.getNonMotorVehicleID(), vmsNonMotorVehicle.getDeviceID(), vmsNonMotorVehicle.getShotTime(), AlarmMsgType.NON_MOTOR_VEHICLES.getValue(), vmsImageList);
     }
 }

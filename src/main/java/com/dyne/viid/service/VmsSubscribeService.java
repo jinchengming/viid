@@ -1,11 +1,11 @@
 package com.dyne.viid.service;
 
-import com.dyne.viid.entity.VmsSubscribe;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.dyne.viid.entity.VmsSubscribe;
 
 /**
  * <p>
- *  服务类
+ * 服务类
  * </p>
  *
  * @author cm_fighting
@@ -13,4 +13,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface VmsSubscribeService extends IService<VmsSubscribe> {
 
+    void saveSubscribe(VmsSubscribe vmsSubscribe);
 }

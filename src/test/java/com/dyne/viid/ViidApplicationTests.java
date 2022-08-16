@@ -22,6 +22,8 @@ class ViidApplicationTests {
     void createExchange() {
 
         DirectExchange directExchange = new DirectExchange("alarm-msg-1400", true, false);
+        // 支持延时推送
+//        directExchange.setDelayed(true);
         amqpAdmin.declareExchange(directExchange);
         log.info("创建交换机：{} 成功", "alarm-msg-1400");
 

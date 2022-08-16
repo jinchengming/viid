@@ -47,4 +47,7 @@ public class Constants {
     public static final String KEEP_ALIVE = "keep::";
 
     public static final String USER_TOKEN = "user::";
+
+    // 订阅缓存
+    public static final String SUBSCRIBE = "sub::";
 }
