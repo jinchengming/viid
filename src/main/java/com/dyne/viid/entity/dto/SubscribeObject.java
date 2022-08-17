@@ -1,5 +1,6 @@
 package com.dyne.viid.entity.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonRootName;
 import io.swagger.annotations.ApiModel;
@@ -16,6 +17,7 @@ import java.time.LocalDateTime;
 @Data
 @ApiModel("订阅对象")
 @JsonRootName("SubscribeObject")
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class SubscribeObject implements Serializable {
 
     private static final long serialVersionUID = -6883905496723268742L;

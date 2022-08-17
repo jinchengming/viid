@@ -15,11 +15,15 @@ public interface VmsDeviceService extends IService<VmsDevice> {
 
 //    VmsDevice getByApeId(String userIdentify);
 
-    void onLineByDeviceId(String deviceId);
+    void onLineByDeviceId(String deviceId, Long registerTime);
 
     void offLineByDeviceId(String deviceId);
 
     String getLocationByUid(String uid);
 
     VmsDevice getByDeviceID(String userIdentify);
+
+    void keepByDeviceId(String deviceId, Long keepTime);
+
+    void checkKeep();
 }

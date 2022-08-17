@@ -9,6 +9,7 @@ import com.dyne.viid.entity.VmsDevice;
 import com.dyne.viid.entity.VmsImage;
 import com.dyne.viid.service.VmsDeviceService;
 import com.dyne.viid.service.VmsImageService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.*;
@@ -50,8 +51,14 @@ public class VmsDeviceController {
 
     @GetMapping
     public Result page(@RequestParam(value = "pageNum", defaultValue = "1") Integer pageNum,
-                       @RequestParam(value = "pageSize", defaultValue = "20") Integer pageSize) {
-        Page<VmsDevice> page = vmsDeviceService.page(new Page<>(pageNum, pageSize), new QueryWrapper<VmsDevice>().orderByDesc("CreateTime"));
+                       @RequestParam(value = "pageSize", defaultValue = "20") Integer pageSize,
+                       @RequestParam(value = "keyWord", required = false) String keyWord) {
+        QueryWrapper<VmsDevice> wrapper = new QueryWrapper<>();
+        if (StringUtils.isNotBlank(keyWord)) {
+            wrapper.and(w -> w.like("Name", keyWord).or().like("ApeID", keyWord));
+        }
+        wrapper.orderByDesc("CreateTime");
+        Page<VmsDevice> page = vmsDeviceService.page(new Page<>(pageNum, pageSize), wrapper);
         return Result.ok().data("page", page);
     }
 

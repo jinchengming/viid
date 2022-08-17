@@ -3,11 +3,10 @@ package com.dyne.viid.common.exception;
 import com.dyne.viid.common.result.ConfirmStatusType;
 import com.dyne.viid.common.result.ResponseStatusObject;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.converter.HttpMessageConversionException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-
-import java.sql.SQLIntegrityConstraintViolationException;
 
 /**
  * 异常处理器
@@ -32,11 +31,11 @@ public class GlobalExceptionHandler {
         return ResponseStatusObject.create(ConfirmStatusType.Invalid_JSON_Format);
     }
 
-    @ExceptionHandler(SQLIntegrityConstraintViolationException.class)
-    public ResponseStatusObject handSQLIntegrityConstraintViolationException(SQLIntegrityConstraintViolationException ex) {
+    @ExceptionHandler(DuplicateKeyException.class)
+    public ResponseStatusObject handDuplicateKeyException(DuplicateKeyException ex) {
         ex.printStackTrace();
         ResponseStatusObject responseStatusObject = ResponseStatusObject.create(ConfirmStatusType.Invalid_JSON_Content);
-        responseStatusObject.setStatusString("重复数据");
+        responseStatusObject.setStatusString("数据已存在");
         return responseStatusObject;
     }
 

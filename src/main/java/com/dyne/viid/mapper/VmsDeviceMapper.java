@@ -19,9 +19,12 @@ public interface VmsDeviceMapper extends BaseMapper<VmsDevice> {
     @Select("select ID,ApeID,UserId,Password,Place from vms_device where ApeID=#{apeId}")
     VmsDevice getByApeId(@Param("apeId") String apeId);
 
-    @Update("update vms_device set IsOnline='1' where ApeID=#{deviceId}")
-    void onLineByDeviceId(@Param("deviceId") String deviceId);
+    @Update("update vms_device set IsOnline='1',RegisterTime=#{registerTime} where ApeID=#{deviceId}")
+    void onLineByDeviceId(@Param("deviceId") String deviceId, @Param("registerTime") Long registerTime);
 
     @Update("update vms_device set IsOnline='0' where ApeID=#{deviceId}")
     void offLineByDeviceId(@Param("deviceId") String deviceId);
+
+    @Update("update vms_device set KeepaliveTime=#{keepTime} where ApeID=#{deviceId}")
+    void keepByDeviceId(@Param("deviceId") String deviceId, @Param("keepTime") Long keepTime);
 }

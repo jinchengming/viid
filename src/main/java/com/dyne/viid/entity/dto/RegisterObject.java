@@ -14,7 +14,7 @@ import java.io.Serializable;
  */
 @Data
 @ApiModel("注册对象")
-@JsonRootName("RegisterObject")
+@JsonRootName(value = "RegisterObject")
 public class RegisterObject implements Serializable {
     private static final long serialVersionUID = 1L;
 

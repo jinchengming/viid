@@ -1,5 +1,6 @@
 package com.dyne.viid.entity.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonRootName;
 import io.swagger.annotations.ApiModel;
@@ -19,6 +20,7 @@ import java.time.LocalDateTime;
 @Data
 @ApiModel("人脸对象")
 @JsonRootName("FaceObject")
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class FaceObject implements Serializable {
     private static final long serialVersionUID = 398457205508099240L;
 

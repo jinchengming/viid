@@ -5,8 +5,6 @@ import com.dyne.viid.common.annotation.RequireAuth;
 import com.dyne.viid.common.constant.Constants;
 import com.dyne.viid.common.utils.DigestUtils;
 import com.dyne.viid.entity.DigestAuthInfo;
-import com.dyne.viid.entity.VmsDevice;
-import com.dyne.viid.service.VmsDeviceService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,14 +42,10 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
     private static final String DIGEST_TEMPLATE = "Digest realm=\"{}\",nonce=\"{}\",qop=\"auth\"";
     private static final String HEADER = "WWW-Authenticate";
 
-
-    private static VmsDeviceService vmsDeviceService;
-
     private static StringRedisTemplate stringRedisTemplate;
 
     @Autowired
-    private void setVmsApeService(VmsDeviceService vmsDeviceService, StringRedisTemplate redisTemplate) {
-        AuthorizationInterceptor.vmsDeviceService = vmsDeviceService;
+    private void setVmsApeService(StringRedisTemplate redisTemplate) {
         AuthorizationInterceptor.stringRedisTemplate = redisTemplate;
     }
 
@@ -76,73 +70,49 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
     }
 
     private boolean isAuth(HttpServletRequest request, HttpServletResponse response) {
+        String requestURI = request.getRequestURI();
+        log.info("URI:{}", requestURI);
         // 根据用户名查询存储的密码
         String userIdentify = request.getHeader(Constants.USER_IDENTIFY);
         log.info("userIdentify:{}", userIdentify);
         if (StringUtils.isNotBlank(userIdentify)) {
-            String requestURI = request.getRequestURI();
-            log.info("URI:{}", requestURI);
             if (requestURI.equals("/VIID/Subscribes")) {
                 if (StringUtils.isBlank(stringRedisTemplate.opsForValue().get(Constants.SERVER_kEY + userIdentify))) {
-                    return false;
+                    return challenge(response);
                 }
             }
             String deviceId = stringRedisTemplate.opsForValue().get(Constants.KEEP_ALIVE + userIdentify);
-//            String deviceId = LocalCacheUtil.get(userIdentify);
             if (StringUtils.isNotBlank(deviceId)) {
                 log.info("{}缓存命中，通过, 续期", deviceId);
                 stringRedisTemplate.opsForValue().set(Constants.KEEP_ALIVE + userIdentify, userIdentify, Constants.TOKEN_EXPIRE, TimeUnit.SECONDS);
                 return true;
+            } else {
+                if (requestURI.equals("/VIID/System/Register")) {
+                    String authStr = request.getHeader(Constants.AUTHORIZATION);
+                    log.info("请求 Authorization 的内容：" + authStr);
+                    if (authStr == null || authStr.length() <= DigestUtils.HEAD.length()) {
+                        // 没有 Authorization 请求头，开启质询
+                        return challenge(response);
+                    }
+                    // 注册
+                    return true;
+                } else {
+                    return challenge(response);
+                }
             }
         } else {
-            return false;
-        }
-
-        String authStr = request.getHeader(Constants.AUTHORIZATION);
-        log.info("请求 Authorization 的内容：" + authStr);
-        if (authStr == null || authStr.length() <= DigestUtils.HEAD.length()) {
-            // 没有 Authorization 请求头，开启质询
+            if (requestURI.equals("/VIID/System/Register")) {
+                String authStr = request.getHeader(Constants.AUTHORIZATION);
+                log.info("请求 Authorization 的内容：" + authStr);
+                if (authStr == null || authStr.length() <= DigestUtils.HEAD.length()) {
+                    // 没有 Authorization 请求头，开启质询
+                    return challenge(response);
+                }
+                // 注册
+                return true;
+            }
             return challenge(response);
         }
-
-        log.info("authStr:{}", authStr);
-        DigestAuthInfo authObject = DigestUtils.getAuthInfoObject(authStr);
-        // 解析 Digest 异常
-        if (authObject == null) {
-            return challenge(response);
-        }
-        /*
-         * 生成 response 的算法：
-         *  response = MD5(MD5(username:realm:password):nonce:nc:cnonce:qop:MD5(<request-method>:url))
-         */
-
-
-        VmsDevice vmsDevice = vmsDeviceService.getByDeviceID(userIdentify);
-        log.info("vms device:{}", vmsDevice);
-        // 设备不存在，开启质询
-        if (vmsDevice == null) {
-            return challenge(response);
-        }
-        // 用户名错误
-        if (!authObject.getUsername().equals(vmsDevice.getUserId())) {
-            return challenge(response);
-        }
-        String HA1 = DigestUtils.md5(StrUtil.format(TEMPLATE_THREE, authObject.getUsername(), authObject.getRealm(), vmsDevice.getPassword()));
-        log.info("authObj:{}", authObject);
-        String HD = StrUtil.format(TEMPLATE_FOUR, authObject.getNonce(), authObject.getNc(), authObject.getCnonce(), authObject.getQop());
-        log.info("HD:{}", HD);
-        String HA2 = DigestUtils.md5(StrUtil.format(TEMPLATE_TWO, request.getMethod(), authObject.getUri()));
-        log.info(StrUtil.format(TEMPLATE_THREE, HA1, HD, HA2));
-        String responseValid = DigestUtils.md5(StrUtil.format(TEMPLATE_THREE, HA1, HD, HA2));
-        // 如果 Authorization 中的 response（浏览器生成的） 与期望的 response（服务器计算的） 相同，则验证通过
-        log.info("Authorization 中的 response: " + authObject.getResponse());
-        log.info("期望的 response: " + responseValid);
-        if (responseValid.equals(authObject.getResponse())) {
-            stringRedisTemplate.opsForValue().set(Constants.KEEP_ALIVE + userIdentify, userIdentify, Constants.TOKEN_EXPIRE, TimeUnit.SECONDS);
-            return true;
-        }
-        // 验证不通过，重复质询
-        return challenge(response);
     }
 
     /**
@@ -166,8 +136,11 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
      * @param args
      */
     public static void main(String[] args) {
-        String authStr = "Digest username=\"32010100001190009999\",realm=\"32010100\", nonce=\"e0cb14f664fb15bb7f75a4ea6f843b31\", \n" +
-                "qop=auth,uri=\"/VIID/System/Register\",algorithm=\"MD5\",response=\"\",nc=00000001,cnonce=\"123456789\"";
+
+        // Digest username="53011284031317000258", realm="dyne1400", nonce="6f487584a3db4473a5be75e55cf556f4", uri="/VIID/System/Register", response="d611e470d421626505327214d8da0369", algorithm=MD5
+        // Digest username="53011284031317000258", realm="dyne1400", nc="", cnonce="",nonce="6f487584a3db4473a5be75e55cf556f4", uri="/VIID/System/Register", algorithm=MD5
+
+        String authStr = "Digest username=\"53011284031317000258\", realm=\"dyne1400\", nonce=\"6f487584a3db4473a5be75e55cf556f4\", uri=\"/VIID/System/Register\", response=\"d611e470d421626505327214d8da0369\", algorithm=MD5";
         log.info("请求 Authorization 的内容：" + authStr);
 
 
@@ -178,9 +151,14 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
          *  response = MD5(MD5(username:realm:password):nonce:nc:cnonce:qop:MD5(<request-method>:url))
          */
         // 根据用户名查询存储的密码
+        System.out.println(StrUtil.format(TEMPLATE_THREE, authObject.getUsername(), authObject.getRealm(), "123456"));
 
         String HA1 = DigestUtils.md5(StrUtil.format(TEMPLATE_THREE, authObject.getUsername(), authObject.getRealm(), "123456"));
+
         String HD = StrUtil.format(TEMPLATE_FOUR, authObject.getNonce(), authObject.getNc(), authObject.getCnonce(), authObject.getQop());
+        System.out.println(HD);
+//        HD = "6f487584a3db4473a5be75e55cf556f4";
+        HD = HD.replace(":null", "");
         String HA2 = DigestUtils.md5(StrUtil.format(TEMPLATE_TWO, "POST", authObject.getUri()));
         String responseValid = DigestUtils.md5(StrUtil.format(TEMPLATE_THREE, HA1, HD, HA2));
         // 如果 Authorization 中的 response（浏览器生成的） 与期望的 response（服务器计算的） 相同，则验证通过

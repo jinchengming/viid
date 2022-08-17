@@ -1,5 +1,6 @@
 package com.dyne.viid.entity.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonRootName;
 import io.swagger.annotations.ApiModel;
@@ -19,6 +20,7 @@ import java.time.LocalDateTime;
 @Data
 @ApiModel("非机动车对象")
 @JsonRootName("NonMotorVehicleObject")
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class NonMotorVehicleObject implements Serializable {
     private static final long serialVersionUID = -33166262437482907L;
 

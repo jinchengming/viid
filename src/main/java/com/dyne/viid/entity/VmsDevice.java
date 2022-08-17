@@ -123,5 +123,13 @@ public class VmsDevice implements Serializable {
     @TableField(fill = FieldFill.INSERT_UPDATE)
     private Date ModifyTime;
 
+    @JsonProperty("RegisterTime")
+    @ApiModelProperty(value = "注册时间")
+    private Long RegisterTime;
+
+    @JsonProperty("KeepaliveTime")
+    @ApiModelProperty(value = "保活时间")
+    private Long KeepaliveTime;
+
 
 }

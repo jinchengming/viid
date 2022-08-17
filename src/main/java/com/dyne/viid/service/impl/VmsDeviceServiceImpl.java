@@ -1,5 +1,6 @@
 package com.dyne.viid.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.dyne.viid.common.constant.Constants;
 import com.dyne.viid.entity.VmsDevice;
@@ -12,6 +13,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
  * <p>
@@ -38,9 +41,8 @@ public class VmsDeviceServiceImpl extends ServiceImpl<VmsDeviceMapper, VmsDevice
 //    }
 
     @Override
-
-    public void onLineByDeviceId(String deviceId) {
-        this.baseMapper.onLineByDeviceId(deviceId);
+    public void onLineByDeviceId(String deviceId, Long registerTime) {
+        this.baseMapper.onLineByDeviceId(deviceId, registerTime);
     }
 
     @Override
@@ -75,5 +77,22 @@ public class VmsDeviceServiceImpl extends ServiceImpl<VmsDeviceMapper, VmsDevice
 
         }
         return this.baseMapper.getByApeId(userIdentify);
+    }
+
+    @Override
+    public void keepByDeviceId(String deviceId, Long keepTime) {
+        this.baseMapper.keepByDeviceId(deviceId, keepTime);
+    }
+
+    @Override
+    public void checkKeep() {
+        List<VmsDevice> vmsDevices = this.baseMapper.selectList(new QueryWrapper<VmsDevice>().select("ID", "ApeID").eq("IsOnline", 1));
+        vmsDevices.forEach(item -> {
+            String keepFlag = stringRedisTemplate.opsForValue().get(Constants.KEEP_ALIVE + item.getApeID());
+            if (StringUtils.isBlank(keepFlag)) {
+                item.setIsOnline("0");
+                this.updateById(item);
+            }
+        });
     }
 }

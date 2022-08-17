@@ -1,6 +1,7 @@
 package com.dyne.viid.scheduled;
 
 
+import com.dyne.viid.service.VmsDeviceService;
 import com.dyne.viid.service.VmsServerService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,10 +21,19 @@ public class RegisterTask {
     @Autowired
     private VmsServerService serverService;
 
+    @Autowired
+    private VmsDeviceService deviceService;
+
     @Scheduled(fixedDelay = 90000)
-    public void task() {
+    public void keepTask() {
         log.info("register keepalive to superior platform ...");
         serverService.keepalive();
+    }
+
+    @Scheduled(fixedDelay = 90000)
+    public void checkKeep() {
+        log.info("check online ...");
+        deviceService.checkKeep();
     }
 
 }
