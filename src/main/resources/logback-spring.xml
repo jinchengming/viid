@@ -3,7 +3,8 @@
     <contextName>logs</contextName>
     <!--  日志位置  -->
     <!--    <property name="log.path" value="/logs/viid"/>-->
-    <property name="log.path" value="/Users/jinchengming/logs/viid1"/>
+<!--    <property name="log.path" value="/Users/jinchengming/logs/viid1"/>-->
+    <property name="log.path" value="G:\logs\viid"/>
     <!--  日志保留时长  -->
     <property name="log.maxHistory" value="15"/>
     <!--  控制台格式化及颜色  -->
