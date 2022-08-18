@@ -65,8 +65,9 @@ public class SubscribeNotificationObject implements Serializable {
     // todo APSStatusObjectList
 
     // todo PersonObjectList
-
-    // todo FaceObjectList
+    @JsonProperty("FaceObjectList")
+    @JSONField(name = "FaceObjectList")
+    private List<FaceObject> FaceObjectList;
 
     // todo MotorVehicleObjectList
 

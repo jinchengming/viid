@@ -6,6 +6,7 @@ import com.dyne.viid.common.constant.Constants;
 import com.dyne.viid.common.utils.DateUtils;
 import com.dyne.viid.entity.VmsDevice;
 import com.dyne.viid.entity.VmsNotificationLog;
+import com.dyne.viid.entity.VmsSubscribe;
 import com.dyne.viid.entity.dto.*;
 import com.dyne.viid.mapper.VmsNotificationLogMapper;
 import com.dyne.viid.service.VmsNotificationLogService;
@@ -45,16 +46,15 @@ public class VmsNotificationLogServiceImpl extends ServiceImpl<VmsNotificationLo
     private StringRedisTemplate stringRedisTemplate;
 
     @Override
-    public void notifyApe(VmsDevice vmsDevice, String url) {
+    public void notifyApe(VmsDevice vmsDevice, VmsSubscribe subscribe, Integer executeOperation) {
         NotifyDto notifyDto = new NotifyDto();
-
         SubscribeNotificationListObject listObject = new SubscribeNotificationListObject();
         SubscribeNotificationObject notificationObject = new SubscribeNotificationObject();
         notificationObject.setNotificationID(generateNotifyID());
-        notificationObject.setTitle("VIID Subscribe");
-        notificationObject.setSubscribeID("320104000050032022081615104300000");
+        notificationObject.setTitle(subscribe.getTitle());
+        notificationObject.setSubscribeID(subscribe.getSubscribeID());
         notificationObject.setTriggerTime(DateUtils.format(new Date(), "yyyyMMddHHmmss"));
-        notificationObject.setExecuteOperation(1);
+        notificationObject.setExecuteOperation(executeOperation);
         notificationObject.setInfoIDs(vmsDevice.getApeID());
         APEObject apeObject = new APEObject();
         BeanUtils.copyProperties(vmsDevice, apeObject);
@@ -64,7 +64,6 @@ public class VmsNotificationLogServiceImpl extends ServiceImpl<VmsNotificationLo
         ArrayList<SubscribeNotificationObject> notifyList = new ArrayList<>();
         notifyList.add(notificationObject);
         listObject.setSubscribeNotificationObject(notifyList);
-
         notifyDto.setSubscribeNotificationListObject(listObject);
         String jsonStr = JSON.toJSONString(notifyDto);
         log.info("notify json:{}", jsonStr);
@@ -75,7 +74,45 @@ public class VmsNotificationLogServiceImpl extends ServiceImpl<VmsNotificationLo
         //发起post请求
         ResponseEntity<String> stringResponseEntity = null;
         try {
-            stringResponseEntity = restTemplate.postForEntity(url, formEntity, String.class);
+            stringResponseEntity = restTemplate.postForEntity(subscribe.getReceiveAddr(), formEntity, String.class);
+            log.info("ResponseEntity----" + stringResponseEntity);
+            // todo : 通知日志;
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("通知错误：{}", e.getMessage());
+        }
+    }
+
+    @Override
+    public void notifyFace(FaceObject faceObject, VmsSubscribe subscribe, Integer executeOperation) {
+        NotifyDto notifyDto = new NotifyDto();
+        SubscribeNotificationListObject listObject = new SubscribeNotificationListObject();
+        SubscribeNotificationObject notificationObject = new SubscribeNotificationObject();
+        notificationObject.setNotificationID(generateNotifyID());
+        notificationObject.setTitle(subscribe.getTitle());
+        notificationObject.setSubscribeID(subscribe.getSubscribeID());
+        notificationObject.setTriggerTime(DateUtils.format(new Date(), "yyyyMMddHHmmss"));
+        notificationObject.setExecuteOperation(executeOperation);
+        notificationObject.setInfoIDs(faceObject.getFaceID());
+//        APEObject apeObject = new APEObject();
+//        BeanUtils.copyProperties(vmsDevice, apeObject);
+        ArrayList<FaceObject> faceObjectList = new ArrayList<>(1);
+        faceObjectList.add(faceObject);
+        notificationObject.setFaceObjectList(faceObjectList);
+        ArrayList<SubscribeNotificationObject> notifyList = new ArrayList<>();
+        notifyList.add(notificationObject);
+        listObject.setSubscribeNotificationObject(notifyList);
+        notifyDto.setSubscribeNotificationListObject(listObject);
+        String jsonStr = JSON.toJSONString(notifyDto);
+        log.info("notify json:{}", jsonStr);
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Type", "application/json");
+        headers.add("User-Identify", "32010400005037000222");
+        HttpEntity<String> formEntity = new HttpEntity<String>(jsonStr, headers);
+        //发起post请求
+        ResponseEntity<String> stringResponseEntity = null;
+        try {
+            stringResponseEntity = restTemplate.postForEntity(subscribe.getReceiveAddr(), formEntity, String.class);
             log.info("ResponseEntity----" + stringResponseEntity);
         } catch (Exception e) {
             e.printStackTrace();
@@ -84,12 +121,7 @@ public class VmsNotificationLogServiceImpl extends ServiceImpl<VmsNotificationLo
     }
 
     @Override
-    public void notifyFace(FaceObject faceObject) {
-
-    }
-
-    @Override
-    public void notifyPerson(PersonObject personObject) {
+    public void notifyPerson(PersonObject personObject, VmsSubscribe subscribe, Integer executeOperation) {
 
     }
 
@@ -110,6 +142,5 @@ public class VmsNotificationLogServiceImpl extends ServiceImpl<VmsNotificationLo
         String timeStr = DateUtils.format(new Date(), "yyyyMMddHHmmss");
         return areaCode + "04" + timeStr + serialStr.substring(serialStr.length() - 5);
     }
-
 
 }

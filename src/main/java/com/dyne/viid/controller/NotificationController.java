@@ -33,6 +33,7 @@ public class NotificationController {
 //        return ResponseStatusListObject.create(null);
 //    }
 
+    // todo 打开认证
     //    @RequireAuth
     @PostMapping("/SubscribeNotifications")
     @LogOperation("订阅通知")

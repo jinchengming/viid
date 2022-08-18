@@ -26,4 +26,6 @@ public interface VmsDeviceService extends IService<VmsDevice> {
     void keepByDeviceId(String deviceId, Long keepTime);
 
     void checkKeep();
+
+    void saveApe(VmsDevice device);
 }

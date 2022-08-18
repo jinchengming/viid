@@ -35,6 +35,12 @@ public class VmsSubscribeServiceImpl extends ServiceImpl<VmsSubscribeMapper, Vms
         }
     }
 
+    @Override
+    public VmsSubscribe subscribed(String apeID) {
+        // todo : 查询是否订阅 返回订阅信息
+        return null;
+    }
+
     private void createSubscribe(VmsSubscribe vmsSubscribe) {
         String subscribeID = vmsSubscribe.getSubscribeID();
         /*

@@ -210,6 +210,8 @@ public class VmsFace implements Serializable {
     @ApiModelProperty(value = "是否可疑人")
     private Integer IsSuspiciousPerson;
 
+    private String Temperature;
+
     @ApiModelProperty(value = "姿态分布")
     private String Attitude;
 

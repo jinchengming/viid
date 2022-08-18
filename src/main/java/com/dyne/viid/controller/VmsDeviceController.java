@@ -36,14 +36,10 @@ public class VmsDeviceController {
     @Autowired
     private VmsImageService vmsImageService;
 
-    @Value("${viid.aps-id}")
-    private String apsID;
-
 
     @PostMapping
     public Result save(@RequestBody VmsDevice device) {
-        device.setOwnerApsID(apsID);
-        vmsDeviceService.save(device);
+        vmsDeviceService.saveApe(device);
         return Result.ok();
     }
 

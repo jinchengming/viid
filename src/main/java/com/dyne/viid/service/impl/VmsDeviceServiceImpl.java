@@ -5,12 +5,16 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.dyne.viid.common.constant.Constants;
 import com.dyne.viid.entity.VmsDevice;
 import com.dyne.viid.entity.VmsServer;
+import com.dyne.viid.entity.VmsSubscribe;
 import com.dyne.viid.mapper.VmsDeviceMapper;
 import com.dyne.viid.service.VmsDeviceService;
+import com.dyne.viid.service.VmsNotificationLogService;
 import com.dyne.viid.service.VmsServerService;
+import com.dyne.viid.service.VmsSubscribeService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -28,11 +32,20 @@ import java.util.List;
 @Slf4j
 public class VmsDeviceServiceImpl extends ServiceImpl<VmsDeviceMapper, VmsDevice> implements VmsDeviceService {
 
+    @Value("${viid.aps-id}")
+    private String apsID;
+
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
 
     @Autowired
     private VmsServerService vmsServerService;
+
+    @Autowired
+    private VmsSubscribeService subscribeService;
+
+    @Autowired
+    private VmsNotificationLogService notificationLogService;
 
 
 //    @Override
@@ -94,5 +107,19 @@ public class VmsDeviceServiceImpl extends ServiceImpl<VmsDeviceMapper, VmsDevice
                 this.updateById(item);
             }
         });
+    }
+
+    @Override
+    public void saveApe(VmsDevice device) {
+        device.setOwnerApsID(apsID);
+        int insert = this.baseMapper.insert(device);
+        if (insert > 0){
+            // 判断是否订阅
+            VmsSubscribe subscribe = subscribeService.subscribed(device.getApeID());
+            if(subscribe != null){
+                // 发送订阅通知
+                notificationLogService.notifyApe(device, subscribe);
+            }
+        }
     }
 }

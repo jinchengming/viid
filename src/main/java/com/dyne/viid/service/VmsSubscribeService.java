@@ -14,4 +14,6 @@ import com.dyne.viid.entity.VmsSubscribe;
 public interface VmsSubscribeService extends IService<VmsSubscribe> {
 
     void saveSubscribe(VmsSubscribe vmsSubscribe);
+
+    VmsSubscribe subscribed(String apeID);
 }
