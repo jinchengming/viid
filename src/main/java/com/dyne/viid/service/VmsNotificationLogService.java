@@ -19,8 +19,8 @@ public interface VmsNotificationLogService extends IService<VmsNotificationLog> 
     /*
         通知Ape设备
      */
-    void notifyApe(VmsDevice vmsDevice);
-    
+    void notifyApe(VmsDevice vmsDevice, String url);
+
     /*
         通知人脸
      */

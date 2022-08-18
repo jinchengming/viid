@@ -33,7 +33,7 @@ public class RegisterTask {
     @Scheduled(fixedDelay = 90000)
     public void checkKeep() {
         log.info("check online ...");
-        deviceService.checkKeep();
+//        deviceService.checkKeep();
     }
 
 }

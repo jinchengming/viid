@@ -50,4 +50,7 @@ public class Constants {
 
     // 订阅缓存
     public static final String SUBSCRIBE = "sub::";
+
+    // Serial number
+    public static final String NOTIFY_SERIAL = "serial::notify";
 }

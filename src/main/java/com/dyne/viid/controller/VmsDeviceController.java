@@ -11,6 +11,7 @@ import com.dyne.viid.service.VmsDeviceService;
 import com.dyne.viid.service.VmsImageService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,9 +36,13 @@ public class VmsDeviceController {
     @Autowired
     private VmsImageService vmsImageService;
 
+    @Value("${viid.aps-id}")
+    private String apsID;
+
 
     @PostMapping
     public Result save(@RequestBody VmsDevice device) {
+        device.setOwnerApsID(apsID);
         vmsDeviceService.save(device);
         return Result.ok();
     }

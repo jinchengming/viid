@@ -5,7 +5,7 @@ server:
 
 spring:
   profiles:
-    active: uat
+    active: prod
   http:
     digest:
       relam: dyne1400
@@ -42,3 +42,5 @@ mybatis-plus:
 
 viid:
   aps-id: 32010400005037000222
+  area-code: 320104000050
+
